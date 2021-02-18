@@ -1,0 +1,226 @@
+import pygame,sys  
+pygame.init()
+size = width, height = 504, 504
+speed = [1,1]   
+t=0            #0为黑子
+now=True
+ball_logic  = []    # 记录黑子和白子逻辑位置，list类型
+l1=[]
+c1=[]
+d=()
+BLACK = 0, 0, 0
+gold=255,251,0
+plist = [(30, 30), (30, 600), (60, 30), (60, 600), (90, 30), (90, 600),(120,30),(120,600),(150,30),(150,600),(180, 30), (180, 600), (210, 30), (210, 600), (240, 30), (240, 600),(270,30),(270,600),(300,30),(300,600)]   #棋盘绘制(x1,y1)
+screen = pygame.display.set_mode(size, pygame.RESIZABLE)  #窗口大小可调
+#screen = pygame.display.set_mode(size, pygame.NOFRAME)  #窗口无边框
+#screen = pygame.display.set_mode(size, pygame.FULLSCREEN)  #窗口全屏显示
+ 
+pygame.display.set_caption("Pygame 五子棋")
+#ball = pygame.image.load("白子.png")
+#pygame.draw.circle(screen, (0,0,0), (200, 180), 30, 5)
+#pygame.draw.lines(screen, gold, True, plist, 2)
+
+
+#ballrect = ball.get_rect()              #rect对象
+#ballrect.top=0
+#screen.blit(ball, ballrect)             #绘制一个
+
+#fps = 300
+fclock = pygame.time.Clock()
+
+#def chessboard():
+position=[]
+class core(object):
+    top, left, space, lines = (20, 20, 36, 15)    # 棋盘格子位置相关
+    pos={}
+    def init(self):
+    #画point
+        self.points = [[] for i in range(self.lines)]#定义15*15
+        for i in range(self.lines):
+            for j in range(self.lines):
+                self.points[i].append([i*self.space,j*self.space])
+        for i in range(self.lines):
+            pygame.draw.aaline(screen, gold, self.points[i][0],self.points[i][14], blend= 1)
+            pygame.draw.aaline(screen, gold, self.points[0][i],self.points[14][i], blend= 1)
+            #print('222223')
+            #self._white_chessball=pygame.image.load(r'E:\work\white.png')
+            #self._black_chessball=pygame.image.load(r'E:\work\black.png')
+    
+
+    def trans(l):
+                      #物理坐标与逻辑坐标转换
+        x=l[0]-36/2
+        y=l[1]-36/2
+
+        i=round(x/36)                    #point物理坐标，i，j逻辑
+        j=round(y/36)
+        global t,ball_logic
+        
+        if t==0:                    #黑子
+            pos={'type':0,'chess_position':(i,j)}                  #dict类型
+            
+        elif t==1:
+            pos={'type':1,'chess_position':(i,j)}
+        ball_logic.append(pos)          #记录棋盘情况
+        return (i,j)
+
+    def check():    #检测落子合法性
+        global now,c1,ball_logic
+        a1=None
+        b1=None
+        ll1=0
+        for a1 in ball_logic[:]:          #倒数第一之前
+            l1.append(a1)                   #用list记录棋盘
+            if ll1==0:
+                ll1=1
+                continue
+            elif ll1==1:
+                l1.pop(0)               #删除第一个元素
+        for b1 in l1[0:-1]:
+            print(b1['chess_position'])
+            print((i,j))
+            if (i,j)==b1['chess_position']: #当前值与以往值
+                now=False
+                l1.pop(-1)             #删去最后一项
+                break
+            else:
+                now=True       
+        print('l1=')
+        print(l1)
+        print('b1=')
+        print(b1)
+        print( l1[-1],(i,j))                       #当前值
+
+    def drop(x,y):                 #落棋子，i，j为逻辑坐标
+        #white_chessball_rect = ball.get_rect()            #rect对象                                #画棋子
+        #black_chessball_rect = ball.get_rect()            #rect对象
+        #screen.blit(ball, ballrect)
+        #x=q[0]
+        #y=q[1]      
+        print('now=%s' %now)
+        global t  
+        print('t=%d' %t)
+        if now==True:
+            _white_chessball=pygame.image.load(r'E:\work\white.png')
+            _black_chessball=pygame.image.load(r'E:\work\black.png')
+            if x>13:
+                x=13
+            if y>13:
+                y=13
+            if t==0:                #黑子走
+                screen.blit(_black_chessball, (x*36+12/2,y*36+12/2))
+                t=1
+            elif t==1:  
+                screen.blit(_white_chessball, (x*36+12/2,y*36+12/2))
+                t=0
+        print('  ')
+        #print('x,y=%d,%d/n' %(x,y))
+        #print('x*36+10/2,y*36+25/2)=%f,%f' %((x*36+12/2),(y*36+12/2)))
+        '''
+    def judge():
+        x=0
+        if now==True:       #落子正确
+            if t==0:        #黑子 (i,j)
+                for x in range((i-4),(i+4)):
+                    if x<0:
+                        x=0
+                    #d1=l1[l1.index(x,j)]
+                    #d1['type']==0
+                    l1.index({'type': 1})
+                    l1.sort(key = lambda x:x[0]!='b')
+                    print(l1.index({'type': 1, 'chess_position': (x, j)}))
+                    print('blackchess win')
+            else:
+                print('nothing')
+                '''
+    def  check_over(self):
+        global d
+        #if len(self.ball_coord)>8:    # 只有黑白子已下4枚以上才判断
+        direct = [(1,0),(0,1),(1,1),(1,-1)]    #横、竖、斜、反斜 四个方向检查
+        for d in direct:
+            if self._check_direct(d):
+                if t==0:
+                    print('whitechess_win!!!')
+                    pygame.display.set_caption('whitechess_win!!!!!!!!!!')
+                else:
+                    print('blackchess_win!!!')
+                    pygame.display.set_caption('blackchess_win!!!!!!!!!!')
+
+                return True
+        return False
+     
+    # 判断最后一个棋子某个方向是否连成5子，direct:(1,0),(0,1),(1,1),(1,-1)
+    @classmethod        #声明一个类方法
+    def _check_direct(self, direct):
+        global d
+        dt_x, dt_y = direct    
+        last = l1[-1]
+        line_ball = []    # 存放在一条线上的棋子
+        for ball in l1:
+            if ball['type'] == last['type']:
+                q1,q2 = ball['chess_position'] 
+                q3,q4 = ball['chess_position']
+                x = q1-q3
+                y = q2-q4
+                #x = ball['coord'].x - last['coord'].x 
+                #y = ball['coord'].y - last['coord'].y
+                if dt_x == 0:
+                    if x == 0:
+                        line_ball.append(ball['chess_position'])
+                        continue
+                if dt_y == 0:
+                    if y == 0:
+                        line_ball.append(ball['chess_position'])
+                        continue
+                if x*dt_y == y*dt_x:
+                    line_ball.append(ball['chess_position'])
+
+        if len(line_ball) >= 5:    # 只有5子及以上才继续判断
+            sorted_line = sorted(line_ball)                     #排序默认升序
+            for i,item in enumerate(sorted_line):               #将一个可遍历的数据对象(如列表、元组或字符串)组合为一个索引序列，同时列出数据和数据下标
+                index = i+4
+                if index < len(sorted_line):
+                    if dt_x == 0:
+                        y1 = item[1]
+                        y2 = sorted_line[index]
+                        y2 = y2[1]
+                        if abs(y1-y2) == 4:    # 此点和第5个点比较y值，如相差为4则连成5子
+                            return True
+                    else:
+                        x1 = item[0]
+                        x2 = sorted_line[index]
+                        x2=x2[0]
+                        if abs(x1-x2) == 4: # 此点和第5个点比较x值，如相差为4则连成5子
+                            return True
+                else:
+                    break
+        return False
+    
+
+while True: 
+    for event in pygame.event.get():
+        if  event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN:# 鼠标键释放事件
+            if event.button == 1:                                       # 按下的是鼠标左键
+                i,j=core.trans(event.pos)    # 将物理坐标转换成矩阵的逻辑坐标，#•event.pos鼠标当前坐标值(x,y)，相对于窗口左上角                                                                    
+                core.check()
+                core.drop(i,j)
+                core.check_over(core)
+                #core.judge()
+        elif event.type == pygame.VIDEORESIZE:
+             size = width, height = event.size[0], event.size[1]
+             screen = pygame.display.set_mode(size, pygame.RESIZABLE)
+             #ballrect = ballrect.move(speed)
+  
+     #screen.fill(BLACK)
+     #screen.blit(ball, ballrect)
+    pygame.display.update()
+     #fclock.tick(fps)
+
+    core.init(core)
+    #core.trans(core)
+    #core.drop(core,x1,y1)
+
+     #chessboard()
+     
